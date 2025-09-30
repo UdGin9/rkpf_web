@@ -6,9 +6,32 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useNavigationStore } from "./store/navigationStore";
+import { HomePage } from "./pages/Home";
+import { SettingsPage } from "./pages/settingsPage";
+import { ChevronRight } from "lucide-react";
 
 
-function App() {
+const routes = [
+  { title: "Главная", component: <HomePage /> },
+  { title: "Расчет", component: <HomePage /> },
+  { title: "Безразмерный вид", component: <SettingsPage /> },
+  { title: "Регулятор", component: <SettingsPage /> },
+  { title: "Результат", component: <SettingsPage /> },
+]
+
+
+export const App = () => {
+
+  const { currentRoute } = useNavigationStore()
+
+  console.log(currentRoute)
+
+  const currentPage = routes.find(route => route.title === currentRoute)?.component || (
+  <div className="p-6">Страница не найдена</div>
+  )
+
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -19,14 +42,20 @@ function App() {
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
           />
-          <div className='font-normal'>Главная</div>
+        <div className="flex items-center space-x-2 text-gray-600 text-lg">
+          {currentRoute == 'Главная' ? <a href="/" className="hover:text-blue-600 transition">Главная</a>:
+          <>
+          <a href="/" className="hover:text-blue-300 transition">Главная</a>
+          <span className="text-gray-400">
+            <ChevronRight className="w-4 h-4" />
+          </span>
+          <span className="text-gray-600">{currentRoute}</span>
+          </>
+          }
+        </div>
         </header>
-
-      
-
+        {currentPage}
       </SidebarInset>
     </SidebarProvider>
   )
 }
-
-export default App;

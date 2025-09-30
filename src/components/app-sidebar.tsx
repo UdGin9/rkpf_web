@@ -1,23 +1,47 @@
 import * as React from "react"
 
-import { SearchForm } from "@/components/search-form"
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarRail,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar"
+import { useNavigationStore } from "@/store/navigationStore"
 
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+const itemsNavigate = [
+  {title: 'Главная' },
+  { title: "Расчет" },
+  { title: "Безразмерный вид" },
+  { title: "Регулятор" },
+  { title: "Результат" },
+]
+
+export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+
+  const { updateCurrentRoute } = useNavigationStore()
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <SearchForm />
+        <img src='images/samgtu_logo.png'/>
       </SidebarHeader>
-      <SidebarContent>
+        <SidebarContent>
+          <SidebarMenu>
 
-      </SidebarContent>
+            <SidebarMenuItem>
+              {itemsNavigate.map((item)=>(
+              <SidebarMenuButton onClick={() => updateCurrentRoute(item.title)}>
+                {item.title}
+              </SidebarMenuButton>
+              ))}
+            </SidebarMenuItem>
+
+          </SidebarMenu>
+        </SidebarContent>
       <SidebarRail />
     </Sidebar>
   )
