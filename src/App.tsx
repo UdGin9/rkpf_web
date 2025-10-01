@@ -25,10 +25,8 @@ export const App = () => {
 
   const { currentRoute } = useNavigationStore()
 
-  console.log(currentRoute)
-
   const currentPage = routes.find(route => route.title === currentRoute)?.component || (
-  <div className="p-6">Страница не найдена</div>
+  <div className="p-6 text-lg">Страница не найдена</div>
   )
 
 

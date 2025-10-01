@@ -1,28 +1,19 @@
-import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { useTableStore } from "@/store/store";
 
 export const TableData = () => {
 
-  const [rows, setRows] = useState<Array<{
-    id: number;
-    data:string;
-    sigma: string;
-    oneMinusSigma: string;
-    theta: string;
-    oneMinusTheta: string;
-    product: string;
-  }>>(
-    Array.from({ length: 15 }, (_, i) => ({
-      id: i + 1,
-      data: "",
-      sigma: "",
-      oneMinusSigma: "",
-      theta: "",
-      oneMinusTheta: "",
-      product: "",
-    }))
-  );
+  const { rows, updateCell } = useTableStore()
+
+  const handleDataChange = (id: number, value: string) => {
+
+    const isValidInput = /^$|^[0-9]*\.?[0-9]*$/.test(value)
+    
+    if (!isValidInput) return
+
+    updateCell(id, "rowData", value)
+  };
 
   return (
     <div className="overflow-x-auto w-full">
@@ -47,10 +38,11 @@ export const TableData = () => {
 
               <TableCell className="text-center font-medium border-r border-gray-200 h-10 px-2">
                 <Input
-                  type="text"
-                  value={row.data}
+                  type="text" inputMode="decimal"
                   className="h-full p-0 text-center focus-visible:ring-1 focus-visible:ring-blue-400"
-                  placeholder="0"
+                  placeholder="0.0"
+                  value={row.rowData}
+                  onChange={(e) => handleDataChange(row.id, e.target.value)}
                 />
               </TableCell>
 
