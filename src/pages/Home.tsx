@@ -39,7 +39,6 @@ export const HomePage = () => {
             </p>
           </div>
 
-          {/* Числовые параметры */}
           <div className="bg-amber-50 border-l-4 border-amber-400 p-5 rounded-r-lg shadow-sm">
             <h2 className="text-xl font-semibold text-amber-800 mb-3">Числовые характеристики модели</h2>
             <p>

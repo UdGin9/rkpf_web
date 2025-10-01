@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { useNavigationStore } from "@/store/navigationStore"
+import { useNavigationStore } from "@/store/store"
 
 
 const itemsNavigate = [
@@ -26,15 +26,15 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="p-4">
         <img src='images/samgtu_logo.png'/>
       </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
 
-            <SidebarMenuItem>
+            <SidebarMenuItem className="flex flex-col gap-4 pl-4">
               {itemsNavigate.map((item)=>(
-              <SidebarMenuButton onClick={() => updateCurrentRoute(item.title)}>
+              <SidebarMenuButton className="text-lg" onClick={() => updateCurrentRoute(item.title)}>
                 {item.title}
               </SidebarMenuButton>
               ))}

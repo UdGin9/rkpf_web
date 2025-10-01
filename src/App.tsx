@@ -6,18 +6,18 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { useNavigationStore } from "./store/navigationStore";
+import { useNavigationStore } from "./store/store";
 import { HomePage } from "./pages/Home";
-import { SettingsPage } from "./pages/settingsPage";
+import { InputDataPage } from "./pages/InputDataPage";
 import { ChevronRight } from "lucide-react";
 
 
 const routes = [
   { title: "Главная", component: <HomePage /> },
-  { title: "Расчет", component: <HomePage /> },
-  { title: "Безразмерный вид", component: <SettingsPage /> },
-  { title: "Регулятор", component: <SettingsPage /> },
-  { title: "Результат", component: <SettingsPage /> },
+  { title: "Расчет", component: <InputDataPage /> },
+  { title: "Безразмерный вид", component: <HomePage /> },
+  { title: "Регулятор", component: <HomePage /> },
+  { title: "Результат", component: <HomePage /> },
 ]
 
 
@@ -43,7 +43,7 @@ export const App = () => {
             className="mr-2 data-[orientation=vertical]:h-4"
           />
         <div className="flex items-center space-x-2 text-gray-600 text-lg">
-          {currentRoute == 'Главная' ? <a href="/" className="hover:text-blue-600 transition">Главная</a>:
+          {currentRoute == 'Главная' ? <a href="/" className="hover:text-blue-300 transition">Главная</a>:
           <>
           <a href="/" className="hover:text-blue-300 transition">Главная</a>
           <span className="text-gray-400">
