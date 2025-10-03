@@ -12,9 +12,9 @@ export const TableData = () => {
     
     if (!isValidInput) return
 
-    updateCell(id, "rowData", value)
+    updateCell(id, "data", value)
   };
-
+  
   return (
     <div className="overflow-x-auto w-full">
       <Table className="w-full table-fixed">
@@ -41,7 +41,7 @@ export const TableData = () => {
                   type="text" inputMode="decimal"
                   className="h-full p-0 text-center focus-visible:ring-1 focus-visible:ring-blue-400"
                   placeholder="0.0"
-                  value={row.rowData}
+                  value={row.data}
                   onChange={(e) => handleDataChange(row.id, e.target.value)}
                 />
               </TableCell>
