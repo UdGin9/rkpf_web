@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { useTableStore } from "@/store/store";
+import { useTableStore } from "@/stores/useTableStore";
 
 export const TableData = () => {
 

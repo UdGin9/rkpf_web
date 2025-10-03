@@ -22,43 +22,34 @@ async def calculate(request: Request):
         body = await request.json()
         print("Полученные данные:", body)
 
-        # Извлекаем поля
         time_step_seconds = body.get("time_step_seconds")
         data_str_list = body.get("data")
         x_in = body.get("x_in")
         x_in_infinity = body.get("x_in_infinity")
-        x_out_infinity = body.get("x_out_infinity")
         contur_level = body.get("contur_level", "Обычный контур")
 
-        # Проверка обязательных полей
         required_fields = {
             "time_step_seconds": time_step_seconds,
             "data": data_str_list,
             "x_in": x_in,
             "x_in_infinity": x_in_infinity,
-            "x_out_infinity": x_out_infinity,
         }
 
         for field_name, value in required_fields.items():
             if value is None or value == "":
                 raise HTTPException(status_code=400, detail=f"Отсутствует обязательное поле: {field_name}")
 
-        # Конвертация типов
         try:
             time_step_seconds = float(time_step_seconds)
             x_in = float(x_in)
             x_in_infinity = float(x_in_infinity)
-            x_out_infinity = float(x_out_infinity)
             data = [float(x) for x in data_str_list]
         except (ValueError, TypeError) as e:
             raise HTTPException(status_code=400, detail=f"Ошибка преобразования данных в число: {str(e)}")
 
-        # Вызов функции расчёта
-        # Ожидается возврат: F1, F2, F3, k, time_array_seconds, y, array_2, array_3, array_4, array_5, array_6
         F1, F2, F3, k, time_array_seconds, y, array_2, array_3, array_4, array_5, array_6 = calculate_transfer_function(
             time_step_seconds=time_step_seconds,
             x_in=x_in,
-            x_out_infinity=x_out_infinity,
             x_in_infinity=x_in_infinity,
             data=data,
             contur_level=contur_level

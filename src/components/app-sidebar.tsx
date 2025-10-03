@@ -9,15 +9,15 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { useNavigationStore } from "@/store/store"
+import { useNavigationStore } from "@/stores/useNavigationStore"
 
 
 const itemsNavigate = [
   {title: 'Главная' },
   { title: "Расчет" },
   { title: "Безразмерный вид" },
-  { title: "Регулятор" },
-  { title: "Результат" },
+  { title: "Передаточная функция"},
+  { title: "Регулятор"},
 ]
 
 export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {

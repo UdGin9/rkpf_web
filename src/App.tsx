@@ -6,18 +6,18 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { useNavigationStore } from "./store/store";
+import { useNavigationStore } from "./stores/useNavigationStore";
 import { HomePage } from "./pages/Home";
 import { InputDataPage } from "./pages/InputDataPage";
 import { ChevronRight } from "lucide-react";
-
+import { GraphDimensionlessPage } from "./pages/GraphDimensionlessPage";
 
 const routes = [
   { title: "Главная", component: <HomePage /> },
   { title: "Расчет", component: <InputDataPage /> },
-  { title: "Безразмерный вид", component: <HomePage /> },
+  { title: "Безразмерный вид", component: <GraphDimensionlessPage /> },
+  { title: "Передаточная функция", component: <HomePage /> },
   { title: "Регулятор", component: <HomePage /> },
-  { title: "Результат", component: <HomePage /> },
 ]
 
 

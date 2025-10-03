@@ -12,9 +12,22 @@ export const useCalculate = () => {
       });
 
       if (!res.ok) {
-        throw new Error(`Ошибка сервера: ${res.status}`);
-      }
+        let errorMessage = `Ошибка сети или сервера: ${res.status}`;
 
+        try {
+          const errorData = await res.json()
+          // Извлекаем `detail`, если есть
+          if (typeof errorData.detail === "string") {
+            errorMessage = errorData.detail
+          } else if (errorData.message) {
+            errorMessage = errorData.message
+          }
+        } catch (parseError) {
+          console.warn("Не удалось распарсить ошибку с сервера", parseError)
+        }
+
+        throw new Error(errorMessage)
+      }
       return res.json();
     },
   });

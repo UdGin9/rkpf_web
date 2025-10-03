@@ -1,15 +1,15 @@
 import numpy as np
 import control 
+from fastapi import HTTPException
 
-def calculate_transfer_function(time_step_seconds, x_in, x_out_infinity, x_in_infinity, data, contur_level):
+def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data, contur_level):
 
     """
     Рассчитывает передаточную функцию по экспериментальным данным методом статистических моментов.
 
     Параметры:
     - time_step_seconds: шаг времени между измерениями (в секундах)
-    - x_in: входное воздействие в начальный момент времени (t = 0)
-    - x_out_infinity: установившееся значение выходной величины (при t → ∞)
+    - x_in: при t = 0
     - x_in_infinity: установившееся значение входного воздействия (при t → ∞)
     - data: список измеренных значений выходной величины (в хронологическом порядке)
     - contur_level: тип контура для выбора формы передаточной функции.
@@ -40,10 +40,10 @@ def calculate_transfer_function(time_step_seconds, x_in, x_out_infinity, x_in_in
     try:
         # Преобразуем строки в числа
         time_step_seconds = float(time_step_seconds)
-        x_out_infinity = float(x_out_infinity)
-        x_out = float(min(data))
-        x_in = float(x_in)
         x_in_infinity = float(x_in_infinity)
+        x_in = float(x_in)
+        x_out = min(data)
+        x_out_infinity = max(data)
 
         # Переводим шаг времени в минуты
         time_step_minutes = time_step_seconds / 60.0
@@ -129,9 +129,23 @@ def calculate_transfer_function(time_step_seconds, x_in, x_out_infinity, x_in_in
 
         return F1, F2, F3, k,  time_array_seconds, y, array_2, array_3, array_4, array_5, array_6
 
-    except ZeroDivisionError as e:
-        print(f"Ошибка: деление на ноль — {e}")
-        return None, None, None
+    except ZeroDivisionError:
+        raise HTTPException(
+            status_code=400,
+            detail="Ошибка расчёта: Входное воздействие = Выходное воздействие при t = ∞ => деление на ноль. Проверьте входные данные."
+        )
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Некорректные данные: {str(e)}"
+        )
+
     except Exception as e:
-        print(f"Ошибка при расчёте: {e}")
-        return None, None, None
+        # Логируем полную ошибку на сервере
+        print(f"Неизвестная ошибка: {e}")
+        # Но пользователю — обезличенное сообщение
+        raise HTTPException(
+            status_code=500,
+            detail="Внутренняя ошибка сервера при выполнении расчёта."
+        )

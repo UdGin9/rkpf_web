@@ -1,30 +1,29 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { TableData } from "@/components/InputDataPage/table/table";
 import { Input } from "@/components/ui/input";
 import { useCalculate } from "@/api/useCalculate";
-import { useTableStore } from "@/store/store";
+import { useTableStore } from "@/stores/useTableStore";
 import { useEffect } from "react";
+import { useGraphDimensionlessStore } from "@/stores/useGraphDimensionlessStore";
+import { useInputsStore } from "@/stores/useInputsStore";
 
 export const InputDataPage = () => {
 
-  const [inputs, setInputs] = useState([
-    { key: 'time_step_seconds', value: '', label: 'Шаг времени снятия показаний' },
-    { key: 'x_in', value: '', label: 'Входное воздействие' },
-    { key: 'x_in_infinity', value: '', label: 'Входное воздействие при t = 0' },
-    { key: 'x_out_infinity', value: '', label: 'Входное воздействие при t = ∞' },
-    { key: 'delay', value: '', label: 'Время запаздывания' },
-  ]);
+  const { inputs, setFieldValue } = useInputsStore()
 
   const { getColumnData, updateColumn } = useTableStore()
- 
-  const handleChange = (index: number, value: string) => {
-    const newInputs = [...inputs]
-    const isValidInput = /^$|^[0-9]*\.?[0-9]*$/.test(value)
-    if (!isValidInput) return
-    newInputs[index].value = value
-    setInputs(newInputs)
-  };
+  const { updateTimeArraySeconds, updateYArray } = useGraphDimensionlessStore()
+
+
+  const handleInputChange = (key: string, rawValue: string) => {
+
+    const isValid = /^$|^[0-9]*\.?[0-9]*$/.test(rawValue);
+    if (!isValid) return;
+
+    const value: string | number = rawValue === '' ? '' : isNaN(Number(rawValue)) ? rawValue : Number(rawValue);
+
+    setFieldValue(key, value);
+  }
 
   const response = useCalculate()
 
@@ -39,9 +38,8 @@ export const InputDataPage = () => {
 
   useEffect(() => {
     if (response.isSuccess && response.data) {
-      const { array_2, array_3, array_4, array_5, array_6 } = response.data;
+      const { array_2, array_3, array_4, array_5, array_6, y, time_array_seconds } = response.data;
 
-      // Проверим, что данные пришли
       if (array_2 && array_3 && array_4 && array_5 && array_6) {
         updateColumn('sigma', array_2.map(String));
         updateColumn('oneMinusSigma', array_3.map(String));
@@ -49,8 +47,13 @@ export const InputDataPage = () => {
         updateColumn('oneMinusTheta', array_5.map(String));
         updateColumn('product', array_6.map(String));
       }
+      if (y && time_array_seconds) {
+        updateTimeArraySeconds(time_array_seconds)
+        updateYArray(y)
+      }
+    
     }
-  }, [response.isSuccess, response.data, updateColumn]);
+  }, [response.isSuccess, response.data, updateColumn])
 
   return (
     <div className="p-4 max-w-6xl mx-auto gap-4 flex flex-col">
@@ -58,7 +61,8 @@ export const InputDataPage = () => {
       <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
           <TableData/>
       </div>
-      {inputs.map((input, index) => (
+      {response.isError ? <div className="flex text-center font-normal text-lg text-red-500">{response.error?.message}</div> : <></>}
+      {inputs.map((input) => (
         <>
         <div className="text-lg">{input.label}</div>
         <Input
@@ -66,7 +70,7 @@ export const InputDataPage = () => {
           type="text"
           placeholder={input.label}
           value={input.value}
-          onChange={(e) => handleChange(index, e.target.value)}
+          onChange={(e) => handleInputChange(input.key, e.target.value)}
         />
         </>
       ))}
