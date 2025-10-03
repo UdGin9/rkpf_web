@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,TooltipProps } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTableStore } from '@/stores/useTableStore';
 import { useEffect, useState } from 'react';
@@ -15,7 +15,6 @@ export const GraphDimensionlessPage = () => {
   const { getColumnData } = useTableStore()
 
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  // Получаем актуальные данные
   const time = getTimeArraySeconds();
   const approx = getYArray();
   const original = getColumnData('sigma').map(Number);
