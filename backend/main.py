@@ -1,15 +1,13 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-# Импортируем твою функцию
 from calculate_transfer_function import calculate_transfer_function
 
 app = FastAPI()
 
-# Настройка CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # В продакшене заменить на нужный origin
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -18,7 +16,7 @@ app.add_middleware(
 @app.post("/calculate")
 async def calculate(request: Request):
     try:
-        # Получаем JSON
+
         body = await request.json()
         print("Полученные данные:", body)
 
@@ -43,7 +41,7 @@ async def calculate(request: Request):
             time_step_seconds = float(time_step_seconds)
             x_in = float(x_in)
             x_in_infinity = float(x_in_infinity)
-            data = [float(x) for x in data_str_list]
+            data = [float(x) for x in data_str_list if x.strip() != '']
         except (ValueError, TypeError) as e:
             raise HTTPException(status_code=400, detail=f"Ошибка преобразования данных в число: {str(e)}")
 

@@ -13,7 +13,7 @@ import { useNavigationStore } from "@/stores/useNavigationStore"
 
 
 const itemsNavigate = [
-  {title: 'Главная' },
+  { title: 'Главная' },
   { title: "Расчет" },
   { title: "Безразмерный вид" },
   { title: "Передаточная функция"},

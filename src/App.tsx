@@ -1,4 +1,3 @@
-import "./App.css";
 import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -11,12 +10,13 @@ import { HomePage } from "./pages/Home";
 import { InputDataPage } from "./pages/InputDataPage";
 import { ChevronRight } from "lucide-react";
 import { GraphDimensionlessPage } from "./pages/GraphDimensionlessPage";
+import { TransferFunctionPage } from "./pages/TransferFunctionPage";
 
 const routes = [
   { title: "Главная", component: <HomePage /> },
   { title: "Расчет", component: <InputDataPage /> },
   { title: "Безразмерный вид", component: <GraphDimensionlessPage /> },
-  { title: "Передаточная функция", component: <HomePage /> },
+  { title: "Передаточная функция", component: <TransferFunctionPage /> },
   { title: "Регулятор", component: <HomePage /> },
 ]
 

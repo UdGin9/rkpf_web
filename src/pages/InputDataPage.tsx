@@ -6,6 +6,7 @@ import { useTableStore } from "@/stores/useTableStore";
 import { useEffect } from "react";
 import { useGraphDimensionlessStore } from "@/stores/useGraphDimensionlessStore";
 import { useInputsStore } from "@/stores/useInputsStore";
+import { useTransferFunction } from "@/stores/useTransferFunction";
 
 export const InputDataPage = () => {
 
@@ -13,6 +14,7 @@ export const InputDataPage = () => {
 
   const { getColumnData, updateColumn } = useTableStore()
   const { updateTimeArraySeconds, updateYArray } = useGraphDimensionlessStore()
+  const { updateF } = useTransferFunction()
 
 
   const handleInputChange = (key: string, rawValue: string) => {
@@ -38,7 +40,11 @@ export const InputDataPage = () => {
 
   useEffect(() => {
     if (response.isSuccess && response.data) {
-      const { array_2, array_3, array_4, array_5, array_6, y, time_array_seconds } = response.data;
+      const { array_2, array_3, array_4, array_5, array_6, y, time_array_seconds, F1, F2, F3, k } = response.data;
+
+      if (F1 && F2 && F3 && k ) {
+        updateF(F1,F2,F3,k)
+      }
 
       if (array_2 && array_3 && array_4 && array_5 && array_6) {
         updateColumn('sigma', array_2.map(String));
@@ -57,7 +63,7 @@ export const InputDataPage = () => {
 
   return (
     <div className="p-4 max-w-6xl mx-auto gap-4 flex flex-col">
-      <h2 className="text-2xl font-bold text-center mb-6">Вводные данные</h2>
+      <h2 className="text-3xl font-bold text-center mb-6">Вводные данные</h2>
       <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
           <TableData/>
       </div>
