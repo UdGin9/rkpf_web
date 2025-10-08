@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pi_regul import pi_regul
 
 from calculate_transfer_function import calculate_transfer_function
 
@@ -24,13 +25,14 @@ async def calculate(request: Request):
         data_str_list = body.get("data")
         x_in = body.get("x_in")
         x_in_infinity = body.get("x_in_infinity")
-        contur_level = body.get("contur_level", "Обычный контур")
+        delay = body.get('delay')
 
         required_fields = {
             "time_step_seconds": time_step_seconds,
             "data": data_str_list,
             "x_in": x_in,
             "x_in_infinity": x_in_infinity,
+            'delay': delay,
         }
 
         for field_name, value in required_fields.items():
@@ -45,13 +47,14 @@ async def calculate(request: Request):
         except (ValueError, TypeError) as e:
             raise HTTPException(status_code=400, detail=f"Ошибка преобразования данных в число: {str(e)}")
 
-        F1, F2, F3, k, time_array_seconds, y, array_2, array_3, array_4, array_5, array_6 = calculate_transfer_function(
+        F1, F2, F3, k, time_array_seconds, y, array_2, array_3, array_4, array_5, array_6, D = calculate_transfer_function(
             time_step_seconds=time_step_seconds,
             x_in=x_in,
             x_in_infinity=x_in_infinity,
             data=data,
-            contur_level=contur_level
         )
+
+        time_array_regul, data_array = pi_regul(F1, delay, k)
 
         return {
             "success": True,
@@ -66,7 +69,10 @@ async def calculate(request: Request):
             "array_4": [float(val) for val in array_4],
             "array_5": [float(val) for val in array_5],
             "array_6": [float(val) for val in array_6],
-            "message": "Расчёт успешно выполнен"
+            "D": D,
+            'time_array_regul': time_array_regul.tolist(),
+            'data_array': data_array.tolist(),
+            "message": "Расчёт успешно выполнен",
         }
 
     except HTTPException as he:

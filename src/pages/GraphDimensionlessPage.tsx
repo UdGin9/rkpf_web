@@ -1,7 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTableStore } from '@/stores/useTableStore';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useGraphDimensionlessStore } from '@/stores/useGraphDimensionlessStore';
 
 type ChartDataPoint = {
@@ -14,15 +14,12 @@ export const GraphDimensionlessPage = () => {
   const { getTimeArraySeconds, getYArray } = useGraphDimensionlessStore();
   const { getColumnData } = useTableStore()
 
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const time = getTimeArraySeconds();
   const approx = getYArray();
   const original = getColumnData('sigma').map(Number);
 
-  useEffect(() => {
-
+  const chartData = useMemo(() => {
     const minLength = Math.min(time.length, approx.length, original.length);
-    
     const data: ChartDataPoint[] = [];
     for (let i = 0; i < minLength; i++) {
       data.push({
@@ -31,10 +28,9 @@ export const GraphDimensionlessPage = () => {
         original: original[i],
       });
     }
-
-    setChartData(data);
-  }, [time, approx, original]);
-  
+    return data;
+  }, [time, approx, original]); 
+    
 
   return (
     <div className='flex flex-col gap-15 p-10 align-center justify-center text-center'>

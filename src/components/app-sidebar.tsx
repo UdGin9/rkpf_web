@@ -8,8 +8,18 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarFooter,
 } from "@/components/ui/sidebar"
 import { useNavigationStore } from "@/stores/useNavigationStore"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { useRegulStore } from "@/stores/useRegulStore"
 
 
 const itemsNavigate = [
@@ -23,6 +33,8 @@ const itemsNavigate = [
 export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
 
   const { updateCurrentRoute } = useNavigationStore()
+  const { regulator, setRegulator } = useRegulStore()
+
 
   return (
     <Sidebar {...props}>
@@ -39,9 +51,25 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
               </SidebarMenuButton>
               ))}
             </SidebarMenuItem>
-
           </SidebarMenu>
+
         </SidebarContent>
+
+            <SidebarFooter className="flex flex-col gap-4 pl-4 pb-10">
+              <Select value={regulator} onValueChange={(value: 'P' | 'PI' | 'PID') => setRegulator(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder='Выберите регулятор' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="P">P-регулятор</SelectItem>
+                    <SelectItem value="PI">PI-регулятор</SelectItem>
+                    <SelectItem value="PID">PID-регулятор</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   )

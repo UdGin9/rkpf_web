@@ -2,7 +2,7 @@ import numpy as np
 import control 
 from fastapi import HTTPException
 
-def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data, contur_level):
+def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data):
 
     """
     Рассчитывает передаточную функцию по экспериментальным данным методом статистических моментов.
@@ -30,6 +30,7 @@ def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data, co
     - array_4: θ-массив (безразмерное время)
     - array_5: 1 - θ
     - array_6: (1 - σ)(1 - θ)
+    - D: среднеквадратическая ошибка
 
     Примечание:
     - Если разница между x_out_infinity и x_out близка к нулю — выбрасывается ошибка деления на ноль.
@@ -106,18 +107,15 @@ def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data, co
         # Формирование числителя и знаменателя передаточной функции
         numerator = [k]
 
-        if contur_level in ["Промежуточная емкость", "Емкость хранения"]:
-            denominator = [F1, 0]  # Безынерционное звено
+        if F2 < 0:
+            # Апериодическое звено 1-го порядка
+            denominator = [F1, 1]
+        elif F3 < 0:
+            # Апериодическое звено 2-го порядка
+            denominator = [F2 * 3600, F1 * 60, 1]  # Перевод в секунды
         else:
-            if F2 < 0:
-                # Апериодическое звено 1-го порядка
-                denominator = [F1, 1]
-            elif F3 < 0:
-                # Апериодическое звено 2-го порядка
-                denominator = [F2 * 3600, F1 * 60, 1]  # Перевод в секунды
-            else:
-                # Апериодическое звено 3-го порядка
-                denominator = [F3 * 216000, F2 * 3600, F1 * 60, 1]  # s³, s², s, const
+            # Апериодическое звено 3-го порядка
+            denominator = [F3 * 216000, F2 * 3600, F1 * 60, 1]  # s³, s², s, const
 
         # Создание передаточной функции
         sys = control.TransferFunction(numerator, denominator)
@@ -126,7 +124,20 @@ def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data, co
         time_array_seconds, y = control.step_response(sys, T=time_array_seconds)
         y = [x / k for x in y]  # Нормировка на k
 
-        return F1, F2, F3, k,  time_array_seconds, y, array_2, array_3, array_4, array_5, array_6
+        y = np.array(y)
+        array_2_new = np.array(array_2)
+        # Вычисление разностей
+        differences = y - array_2_new
+        # Вычисление суммы квадратов разностей
+        sum_of_squares = np.sum(differences ** 2)
+        # Вычисление среднеквадратической ошибки (MSE)
+        mse = sum_of_squares / len(y)
+        # Вычисление среднеквадратического отклонения (RMSE)
+        rmse = np.sqrt(mse)
+
+        D = round(rmse * 100,2)
+
+        return F1, F2, F3, k,  time_array_seconds, y, array_2, array_3, array_4, array_5, array_6, D
 
     except ZeroDivisionError:
         raise HTTPException(
