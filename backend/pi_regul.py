@@ -14,7 +14,7 @@ def pi_regul(F1, tau, k):
     """
 
     # аппроксимация задержки Паде
-    num_pade, den_pade = control.pade(tau, n=2)
+    num_pade, den_pade = control.pade(tau, n=3)
     delay_tf = control.TransferFunction(num_pade, den_pade)
 
     # G(s) = k / (F1*s + 1)
@@ -42,25 +42,21 @@ def pi_regul(F1, tau, k):
     Kcr = 1.0 / gain_at_wc  # условие |Kcr * G(jwc)| = 1
     Tcr = 2 * np.pi / wc  # период автоколебаний
 
-    print(f"Критический коэффициент усиления Kcr = {Kcr:.3f}")
-    print(f"Период автоколебаний Tcr = {Tcr:.3f} с")
+    for kp_factor in [0.5, 0.55, 0.6, 0.65]:
+        for ti_factor in [0.6, 0.65, 0.7, 0.75]:
+            Kp = kp_factor * Kcr
+            Ti = ti_factor * Tcr
+            Ki = Kp / Ti
 
-    # расчет параметров ПИ-регулятора по Зиглеру–Никольсу
-    Kp = 0.45 * Kcr
-    Ki = 0.54 * Kcr / Tcr  # Формула для ПИ-регулятора
+            pi_controller = control.tf([Kp], [1]) + control.tf([Ki], [1, 0])
+            closed_loop = control.feedback(pi_controller * system_with_delay, 1)
+            t, y = control.step_response(closed_loop, T=np.linspace(0, 50, 1000))
 
-    print(f"Параметры ПИ-регулятора: Kp = {Kp:.3f}, Ki = {Ki:.3f}")
+            overshoot = (np.max(y) - 1.0) * 100
+            if 10 <= overshoot <= 20:
+                print(f"Найдены хорошие настройки: Kp={Kp:.3f}, Ki={Ki:.3f}, перерегулирование={overshoot:.1f}%")
+                break
 
-    # создание ПИ-регулятора: Kp + Ki/s
-    Kp_tf = control.tf([Kp], [1])          # Kp
-    Ki_tf = control.tf([Ki], [1, 0])       # Ki/s
-    pi_controller = Kp_tf + Ki_tf
-
-    # замкнутая система: feedback(controller * plant_with_delay, 1)
-    open_loop = pi_controller * system_with_delay
-    closed_loop = control.feedback(open_loop, 1)
-
-    # переходная характеристика
     try:
         t, y = control.step_response(closed_loop, T=np.linspace(0, 50, 1000))
     except Exception as e:

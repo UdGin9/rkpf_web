@@ -19,12 +19,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRegulStore } from "@/stores/useRegulStore";
+import { useRegulGraphStore } from "@/stores/useRegulGraphStore";
 
 export const InputDataPage = () => {
   const { inputs, setFieldValue } = useInputsStore()
   const { getColumnData, updateColumn } = useTableStore()
   const { updateTimeArraySeconds, updateYArray } = useGraphDimensionlessStore()
   const { updateF } = useTransferFunction()
+  const { setChartData } = useRegulGraphStore()
 
   const response = useCalculate()
   const { regulator } = useRegulStore()
@@ -48,10 +50,14 @@ export const InputDataPage = () => {
 
   useEffect(() => {
     if (response.isSuccess && response.data) {
-      const { array_2, array_3, array_4, array_5, array_6, y, time_array_seconds, F1, F2, F3, k, D } = response.data;
+      const { array_2, array_3, array_4, array_5, array_6, y, time_array_seconds, F1, F2, F3, k, D, time_array_regul, data_array } = response.data;
 
       if (F1 && F2 && F3 && k) {
         updateF(F1, F2, F3, k, D);
+      }
+
+      if (time_array_regul && data_array ) {
+        setChartData(time_array_regul, data_array)
       }
 
       if (array_2 && array_3 && array_4 && array_5 && array_6) {
@@ -61,6 +67,7 @@ export const InputDataPage = () => {
         updateColumn('oneMinusTheta', array_5.map(String));
         updateColumn('product', array_6.map(String));
       }
+      console.log('сработало')
 
       if (y && time_array_seconds) {
         updateTimeArraySeconds(time_array_seconds);

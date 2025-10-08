@@ -11,13 +11,14 @@ import { InputDataPage } from "./pages/InputDataPage";
 import { ChevronRight } from "lucide-react";
 import { GraphDimensionlessPage } from "./pages/GraphDimensionlessPage";
 import { TransferFunctionPage } from "./pages/TransferFunctionPage";
+import { RegulPageGraph } from "./pages/RegulPageGraph";
 
 const routes = [
   { title: "Главная", component: <HomePage /> },
   { title: "Расчет", component: <InputDataPage /> },
   { title: "Безразмерный вид", component: <GraphDimensionlessPage /> },
   { title: "Передаточная функция", component: <TransferFunctionPage /> },
-  { title: "Регулятор", component: <HomePage /> },
+  { title: "Регулятор", component: <RegulPageGraph /> },
 ]
 
 
