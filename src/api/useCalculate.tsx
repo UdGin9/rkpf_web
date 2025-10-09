@@ -16,7 +16,7 @@ export const useCalculate = () => {
 
         try {
           const errorData = await res.json()
-          // Извлекаем `detail`, если есть
+          
           if (typeof errorData.detail === "string") {
             errorMessage = errorData.detail
           } else if (errorData.message) {

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import control
 
-def pi_regul(F1, tau, k):
+def pi_regul(F1, tau, k, data):
 
     """
     Расчёт ПИ-регулятора по методу Зиглера–Никольса с учётом запаздывания.
@@ -10,7 +10,7 @@ def pi_regul(F1, tau, k):
     :param F1: постоянная времени объекта (знаменатель: F1*s + 1)
     :param tau: время чистого запаздывания (сек)
     :param k: коэффициент усиления объекта
-    :return: t, y — время и переходная характеристика замкнутой системы
+    :return: t, y — время и переходная характеристика замкнутой системы, Kp - П-коэффициент, Ki - интегральный коэффициент
     """
 
     # аппроксимация задержки Паде
@@ -32,10 +32,10 @@ def pi_regul(F1, tau, k):
     for i in range(len(phase)):
         if phase[i] <= -np.pi:  # -180 градусов
             target_index = i
-            break
+            break   
 
     if target_index is None:
-        raise ValueError("Система не достигает фазы -180° — невозможно определить Kcr.")
+        raise ValueError("Система не достигает фазы -180° — невозможно определить Kcr")
 
     wc = omega[target_index]  # критическая частота
     gain_at_wc = mag[target_index]  # |G(jwc)|
@@ -59,7 +59,8 @@ def pi_regul(F1, tau, k):
 
     try:
         t, y = control.step_response(closed_loop, T=np.linspace(0, 50, 1000))
+        y = max(data) * y
     except Exception as e:
         raise RuntimeError(f"Ошибка при расчёте переходного процесса: {e}")
 
-    return t, y
+    return t, y, Kp, Ki

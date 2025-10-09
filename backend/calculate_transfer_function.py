@@ -2,7 +2,7 @@ import numpy as np
 import control 
 from fastapi import HTTPException
 
-def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data):
+def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data, contur):
 
     """
     Рассчитывает передаточную функцию по экспериментальным данным методом статистических моментов.
@@ -100,28 +100,37 @@ def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data):
         F2 = round(F2, 2)
         F3 = round(F3, 2)
 
-        # Формирование числителя и знаменателя передаточной функции
         numerator = [k]
 
-        if F2 < 0:
-            # Апериодическое звено 1-го порядка
-            denominator = [F1, 1]
-        elif F3 < 0:
-            # Апериодическое звено 2-го порядка
-            denominator = [F2 * 3600, F1 * 60, 1]  # Перевод в секунды
+        if contur in ["Промежуточная емкость", "Емкость хранения"]:
+            # Интегрирующее звено: k / (T1*s)
+            T1_seconds = F1 * 60  
+            denominator = [T1_seconds, 0]
+
+        elif contur == "Температура":
+            # Апериодическое 2-го порядка: k / (T2*s² + T1*s + 1)
+            T1_seconds = F1 * 60
+            T2_seconds = F2 * 3600
+
+            # Если F2 слишком мал или отрицателен, стабилизируем
+            if T2_seconds <= 0:
+                T2_seconds = T1_seconds * 0.1
+            denominator = [T2_seconds, T1_seconds, 1]
+
         else:
-            # Апериодическое звено 3-го порядка
-            denominator = [F3 * 216000, F2 * 3600, F1 * 60, 1]  # s³, s², s, const
+            # Все остальные: апериодическое 1-го порядка: k / (T1*s + 1)
+            T1_seconds = F1 * 60
+            denominator = [T1_seconds, 1]
 
-        # Создание передаточной функции
         sys = control.TransferFunction(numerator, denominator)
+        print(sys)
 
-        # Моделирование переходной характеристики
         time_array_seconds, y = control.step_response(sys, T=time_array_seconds)
-        y = [x / k for x in y]  # Нормировка на k
+        y = [x / k for x in y]
 
         y = np.array(y)
         array_2_new = np.array(array_2)
+
         # Вычисление разностей
         differences = y - array_2_new
         # Вычисление суммы квадратов разностей
@@ -148,9 +157,7 @@ def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data):
         )
 
     except Exception as e:
-        # Логируем полную ошибку на сервере
         print(f"Неизвестная ошибка: {e}")
-        # Но пользователю — обезличенное сообщение
         raise HTTPException(
             status_code=500,
             detail="Внутренняя ошибка сервера при выполнении расчёта."
