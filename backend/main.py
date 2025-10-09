@@ -61,14 +61,20 @@ async def calculate(request: Request):
         
         if contur in ["Промежуточная емкость", "Емкость хранения"]:
             time_array_regul, data_array, Kp = p_regul(F1, delay, k, data=data)
+            Kp = round(Kp,2)
             Ki = None
             Kd = None
             regulator_type = "P"
         elif contur == "Температура":
             time_array_regul, data_array, Kp, Ki, Kd = pid_regul(F1, delay, k, F2, data=data)
+            Kp = round(Kp,2)
+            Ki = round(Ki,2)
+            Kd = round(Kd,2)
             regulator_type = "PID"
         else:
             time_array_regul, data_array, Kp, Ki = pi_regul(F1, delay, k, data=data)
+            Kp = round(Kp,2)
+            Ki = round(Ki,2)
             Kd = None
             regulator_type = "PI"
 
@@ -92,7 +98,7 @@ async def calculate(request: Request):
             "Kp": Kp,
             "Ki": Ki,
             "Kd": Kd,
-            'regulator_type':regulator_type,
+            'regulator_type': regulator_type,
             "message": f"Расчёт успешно выполнен ({regulator_type}-регулятор)"
         }
 

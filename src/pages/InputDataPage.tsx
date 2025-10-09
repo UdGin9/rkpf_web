@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useRegulGraphStore } from "@/stores/useRegulGraphStore"
 import { useConturStore } from "@/stores/useConturStore"
+import { useRegulStore } from '@/stores/useRegulStore';
 
 export const InputDataPage = () => {
   const { inputs, setFieldValue } = useInputsStore()
@@ -27,6 +28,8 @@ export const InputDataPage = () => {
   const { updateTimeArraySeconds, updateYArray } = useGraphDimensionlessStore()
   const { updateF } = useTransferFunction()
   const { setChartData } = useRegulGraphStore()
+  const { setParams } = useRegulStore()
+
 
   const { conturType, levelSubtype, getFullConturName } = useConturStore()
 
@@ -74,7 +77,18 @@ export const InputDataPage = () => {
         D,
         time_array_regul,
         data_array,
+        Kp: Kp,
+        Ki: Ki,
+        Kd: Kd,
+        regulator_type: regulator_type,
       } = response.data;
+
+      setParams({
+        Kp: Kp,
+        Ki: Ki,
+        Kd: Kd,
+        regulatorType: regulator_type,
+      })
 
       if (F1 && F2 && F3 && k) {
         updateF(F1, F2, F3, k, D);

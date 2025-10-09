@@ -1,3 +1,4 @@
+import { useRegulStore } from "@/stores/useRegulStore";
 import { useTransferFunction } from "@/stores/useTransferFunction"
 import { renderToString } from 'katex';
 
@@ -5,11 +6,18 @@ export const TransferFunctionPage = () => {
 
     const { getF } = useTransferFunction()
     const { F1, F2, F3, k, D } = getF()
+    const { regulatorType } = useRegulStore()
 
     let formula = ''
 
-    if (F1 && F2 && F3 && k && D) {
-        formula = `W_0(s) = \\frac{${k}}{${F1}s + 1}`;
+    if (regulatorType == 'PI') {
+        formula = `W_0(s) = \\frac{${k}}{${F1}s + 1}`
+    }
+    else if (regulatorType == 'P') {
+        formula =  `W_0(s) = \\frac{${k}}{${F1}s}`
+    }
+    else {
+        formula = `W_0(s) = \\frac{${k}}{${F2}s^2 + ${F1}s + 1}`
     }
 
     return (
@@ -26,9 +34,8 @@ export const TransferFunctionPage = () => {
                     <div className="text-2xl font-bold text-center">Коэффициенты передаточной функции</div>
                     
                     <div className="text-xl">T<sub>1</sub> = {F1}</div>
-                    <div className="text-xl">T<sub>2</sub> = {F2}</div>
-                    <div className="text-xl">T<sub>3</sub> = {F3}</div>
-                        
+                    {regulatorType == 'PID' ? <div className="text-xl">T<sub>2</sub> = {F2}</div> : <></>}
+                    
                     <div className="text-2xl font-bold text-center">Коэффициент усиления</div>
                     <div className="text-xl">K = {k}</div>
                     <div className="text-2xl font-bold text-center">Ошибка ввода</div>
