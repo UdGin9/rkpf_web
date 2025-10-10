@@ -11,9 +11,9 @@ interface RegulatorParamsState {
 
   setParams: (
     params: Partial<{
-      Kp: number;
-      Ki: number;
-      Kd: number;
+      Kp: number | null | string,
+      Ki: number | null | string,
+      Kd: number | null | string,
       regulatorType: RegulatorType;
     }>
   ) => void;

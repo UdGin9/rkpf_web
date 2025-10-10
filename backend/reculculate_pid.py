@@ -4,6 +4,15 @@ import numpy as np
 
 def reculculate_pid(F1, F2, k, Kp, Ki, Kd, tau, time, data):
 
+    F1 = float(F1)
+    F2 = float(F2)
+    Kp = float(Kp)
+    Ki = float(Ki)
+    Kd = float(Kd)
+    tau = float(tau)
+    k= float(k)
+    time = float(time)
+
     num_pade, den_pade = control.pade(tau, n=3)
     delay_tf = control.TransferFunction(num_pade, den_pade)
     plant = control.TransferFunction([k], [F2, F1, 1])

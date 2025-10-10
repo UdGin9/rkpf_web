@@ -3,6 +3,10 @@ import numpy as np
 
 def reculculate_p(F1, tau, Kp,  k, time,  data):
 
+    Kp = float(Kp)
+    tau = float(tau)
+    k= float(k)
+
     num_pade, den_pade = control.pade(tau, n=3)
     delay_tf = control.TransferFunction(num_pade, den_pade)
     plant = control.TransferFunction([k], [F1, 0])

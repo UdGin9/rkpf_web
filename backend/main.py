@@ -112,14 +112,14 @@ async def calculate(request: Request):
         raise HTTPException(status_code=500, detail=f"Ошибка выполнения расчёта: {str(e)}")
     
 
-@app.post("/reculculate")
-async def calculate(request: Request):
+@app.post("/recalculate")
+async def reculculate(request: Request):
     try:
         body = await request.json()
         print("Полученные данные:", body)
 
         data_str_list = body.get("data")
-        regulator_type = body.get('regulator_type')
+        regulatorType = body.get('regulatorType')
         F1 = body.get('F1')
         F2 = body.get('F2')
         time = body.get('time')
@@ -131,7 +131,7 @@ async def calculate(request: Request):
 
         required_fields = {
             "data": data_str_list,
-            'regulator_type': regulator_type,
+            'regulatorType': regulatorType,
             'time': time,
             'delay': delay,
             'k': k
@@ -141,17 +141,22 @@ async def calculate(request: Request):
             if value is None or value == "":
                 raise HTTPException(status_code=400, detail=f"Отсутствует обязательное поле: {field_name}")
 
+        
+
+        filtered_data_str = [x for x in data_str_list if x is not None and str(x).strip() != '']
+
         try:
-            data = [float(x) for x in data_str_list if x.strip() != '']
+             data = [float(x) for x in filtered_data_str]
         except (ValueError, TypeError) as e:
             raise HTTPException(status_code=400, detail=f"Ошибка преобразования данных в число: {str(e)}")
+        
 
-        if regulator_type == 'P':
+        if regulatorType == 'P':
             time_array_regul, data_array = reculculate_p(F1, delay, Kp, k, time,  data=data)
-        elif regulator_type == 'PI':
+        elif regulatorType == 'PI':
             time_array_regul, data_array = reculculate_pi(F1, k, Kp, Ki, delay, time, data)
         else:
-            time_array_regul, data_array, Kp, Ki = reculculate_pid(F1, F2, k, Kp, Ki, Kd, delay, time, data)
+            time_array_regul, data_array = reculculate_pid(F1, F2, k, Kp, Ki, Kd, delay, time, data)
 
         return {
             "success": True,

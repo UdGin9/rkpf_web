@@ -25,15 +25,25 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTableStore } from '@/stores/useTableStore';
+import { useReCalculate } from '@/api/useReCalculate';
+import { useTransferFunction } from '@/stores/useTransferFunction';
+import { useInputsStore } from '@/stores/useInputsStore';
 
 export const RegulPageGraph = () => {
   const { timeArrayRegul, dataArray } = useRegulGraphStore()
-  const { regulatorType, Kp, Ki, Kd } = useRegulStore()
+  const { getColumnData } = useTableStore()
+  const { regulatorType, Kp, Ki, Kd, setParams } = useRegulStore()
   const [ stateP, setStateP ] = useState<number | null | string>(Kp)
   const [ stateI, setStateI ] = useState<number | null | string>(Ki)
   const [ stateD, setStateD ] = useState<number | null | string>(Kd)
   const [ time, setTime ] = useState<number | null | string>()
+  const { setChartData } = useRegulGraphStore()
+  const delay = useInputsStore(state => {
+  const field = state.inputs.find(input => input.key === 'delay');
+  return field ? Number(field.value) : null; });
+  const { F1, F2, k, } = useTransferFunction()
  
   const onChangeP = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -63,6 +73,8 @@ export const RegulPageGraph = () => {
     }
   }
 
+  const response = useReCalculate()
+
   const chartData =
     timeArrayRegul.length > 0 && dataArray.length > 0
       ? timeArrayRegul.map((t, index) => ({
@@ -72,6 +84,8 @@ export const RegulPageGraph = () => {
       : [];
 
     let formula = '';
+    
+
 
     if (regulatorType === 'P') {
         formula = `W(s) = K_p = ${Kp}`;
@@ -80,6 +94,39 @@ export const RegulPageGraph = () => {
     } else if (regulatorType === 'PID') {
         formula = `W(s) = K_p + \\frac{K_i}{s} + K_d s = ${Kp} + \\frac{${Ki}}{s} + ${Kd}s`;
     }
+  
+  const handleSubmit = () => {
+    const data = getColumnData('data')
+        const payload = {
+          data,
+          F1,
+          F2,
+          time: Number(time),
+          delay,
+          k,
+          Kp: stateP,
+          Ki: stateI,
+          Kd: stateD,
+          regulatorType,
+        };
+    response.mutate(payload)
+    setParams({Kp:stateP, Ki: stateI, Kd: stateD})
+  };
+    useEffect(() => {
+        if (response.isSuccess && response.data) {
+          const {
+            time_array_regul,
+            data_array,
+          } = response.data;
+          
+      if (time_array_regul && data_array) {
+        setChartData(time_array_regul, data_array);
+      }
+        }
+      }, [
+        response.isSuccess,
+        response.data,
+      ]);
 
   return (
     <div className="p-10 flex flex-col gap-10 text-center">
@@ -191,7 +238,7 @@ export const RegulPageGraph = () => {
               Отмена
             </AlertDialogCancel>
 
-            <AlertDialogAction>
+            <AlertDialogAction onClick={handleSubmit}>
               Рассчитать
             </AlertDialogAction>
           </AlertDialogFooter>

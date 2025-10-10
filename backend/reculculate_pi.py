@@ -4,6 +4,10 @@ import control
 
 def reculculate_pi(F1, k, Kp, Ki, tau, time, data):
 
+    Kp = float(Kp)
+    Ki = float(Ki)
+    tau = float(tau)
+    k= float(k)
 
     num_pade, den_pade = control.pade(tau, n=3)
     delay_tf = control.TransferFunction(num_pade, den_pade)

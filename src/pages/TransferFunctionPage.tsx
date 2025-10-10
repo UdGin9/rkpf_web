@@ -7,6 +7,7 @@ export const TransferFunctionPage = () => {
     const { F1, F2, k, D } = useTransferFunction()
     const { regulatorType } = useRegulStore()
 
+    
 
     let formula = ''
 
