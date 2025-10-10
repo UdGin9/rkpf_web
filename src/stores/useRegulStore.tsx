@@ -4,9 +4,9 @@ type RegulatorType = 'P' | 'PI' | 'PID';
 
 interface RegulatorParamsState {
 
-  Kp: number | null;
-  Ki: number | null;
-  Kd: number | null;
+  Kp: number | null | string,
+  Ki: number | null | string,
+  Kd: number | null | string,
   regulatorType: RegulatorType | null;
 
   setParams: (
@@ -27,12 +27,12 @@ export const useRegulStore = create<RegulatorParamsState>((set) => ({
   regulatorType: null,
 
   setParams: (params) =>
-    set({
-      Kp: params.Kp ?? null,
-      Ki: params.Ki ?? null,
-      Kd: params.Kd ?? null,
-      regulatorType: params.regulatorType ?? null,
-    }),
+    set((state) => ({
+      Kp: params.Kp ?? state.Kp,
+      Ki: params.Ki ?? state.Ki,
+      Kd: params.Kd ?? state.Kd,
+      regulatorType: params.regulatorType ?? state.regulatorType,
+    })),
 
   reset: () =>
     set({

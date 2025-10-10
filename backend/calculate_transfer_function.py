@@ -123,7 +123,6 @@ def calculate_transfer_function(time_step_seconds, x_in, x_in_infinity, data, co
             denominator = [T1_seconds, 1]
 
         sys = control.TransferFunction(numerator, denominator)
-        print(sys)
 
         time_array_seconds, y = control.step_response(sys, T=time_array_seconds)
         y = [x / k for x in y]

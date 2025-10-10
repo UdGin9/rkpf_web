@@ -12,10 +12,56 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { useRegulStore } from '@/stores/useRegulStore'
 import { renderToString } from 'katex'
+import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 export const RegulPageGraph = () => {
   const { timeArrayRegul, dataArray } = useRegulGraphStore()
   const { regulatorType, Kp, Ki, Kd } = useRegulStore()
+  const [ stateP, setStateP ] = useState<number | null | string>(Kp)
+  const [ stateI, setStateI ] = useState<number | null | string>(Ki)
+  const [ stateD, setStateD ] = useState<number | null | string>(Kd)
+  const [ time, setTime ] = useState<number | null | string>()
+ 
+  const onChangeP = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+      setStateP(value);
+    }
+  };
+
+  const onChangeI = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+      setStateI(value);
+    }
+  };
+
+  const onChangeD = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+      setStateD(value);
+    }
+  }
+
+  const onChangeTime = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+      setTime(value);
+    }
+  }
 
   const chartData =
     timeArrayRegul.length > 0 && dataArray.length > 0
@@ -97,6 +143,60 @@ export const RegulPageGraph = () => {
           __html: renderToString(formula, { throwOnError: false, displayMode: true }),
           }}
         />
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="outline">
+            Ручная поднастройка регулятора
+          </Button>
+        </AlertDialogTrigger>
+
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+                Вы хотите вручную настроить регулятор
+            </AlertDialogTitle>
+            <AlertDialogDescription> 
+              {regulatorType == 'PID' ? 
+              <div className='flex flex-col gap-5 pt-5'>
+                  <Input value={stateP || ''} placeholder='Введите пропорциональный коэффициент - Kp' onChange={onChangeP}></Input>
+                  <Input value={stateI || ''} placeholder='Введите интегральный коэффициент - Ki' onChange={onChangeI}></Input>
+                  <Input value={stateD || ''} placeholder='Введите диффиренциирущий коэффициент - Kd' onChange={onChangeD}></Input>
+                  <Input value={time || ''} placeholder='Введите время наблюдения' onChange={onChangeTime}></Input>
+              </div> :
+              <>
+              </> 
+              }
+              {regulatorType == 'PI' ? 
+              <div className='flex flex-col gap-5 pt-5'>
+                  <Input value={stateP || ''} placeholder='Введите пропорциональный коэффициент - Kp' onChange={onChangeP}></Input>
+                  <Input value={stateI || ''} placeholder='Введите интегральный коэффициент - Ki' onChange={onChangeI}></Input>
+                  <Input value={time || ''} placeholder='Введите время наблюдения' onChange={onChangeTime}></Input>
+              </div> :
+              <>
+              </> 
+              }
+              {regulatorType == 'P' ? 
+              <div className='flex flex-col gap-5 pt-5'>
+                  <Input value={stateP || ''} placeholder='Введите пропорциональный коэффициент - Kp' onChange={onChangeP}></Input>
+                  <Input value={time || ''} placeholder='Введите время наблюдения' onChange={onChangeTime}></Input>
+              </div> :
+              <>
+              </> 
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              Отмена
+            </AlertDialogCancel>
+
+            <AlertDialogAction>
+              Рассчитать
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -36,7 +36,7 @@ def pid_regul(F1, tau, k, F2, data):
 
     best_Kp, best_Ki, best_Kd = None, None, None
 
-    for kp_factor in [0.4, 0.45, 0.5, 0.55]:
+    for kp_factor in [0.45, 0.5, 0.55, 0.6]:
         for ti_factor in [0.4, 0.45, 0.5]:
             for td_factor in [0.1, 0.12, 0.15]:
                 Kp = kp_factor * Kcr
@@ -47,7 +47,7 @@ def pid_regul(F1, tau, k, F2, data):
 
                 Kp_tf = control.tf([Kp], [1])
                 Ki_tf = control.tf([Ki], [1, 0])
-                Kd_tf = control.tf([Kd, 0], [1])  # Kd*s
+                Kd_tf = control.tf([Kd, 0], [1])
                 pid_controller = Kp_tf + Ki_tf + Kd_tf
 
                 closed_loop = control.feedback(pid_controller * system_with_delay, 1)

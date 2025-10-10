@@ -5,6 +5,9 @@ from calculate_transfer_function import calculate_transfer_function
 from p_regul import p_regul
 from pi_regul import pi_regul
 from pid_regul import pid_regul
+from reculculate_p import reculculate_p
+from reculculate_pi import reculculate_pi
+from reculculate_pid import reculculate_pid
 
 app = FastAPI()
 
@@ -100,6 +103,61 @@ async def calculate(request: Request):
             "Kd": Kd,
             'regulator_type': regulator_type,
             "message": f"Расчёт успешно выполнен ({regulator_type}-регулятор)"
+        }
+
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        print(f"Ошибка на сервере: {e}")
+        raise HTTPException(status_code=500, detail=f"Ошибка выполнения расчёта: {str(e)}")
+    
+
+@app.post("/reculculate")
+async def calculate(request: Request):
+    try:
+        body = await request.json()
+        print("Полученные данные:", body)
+
+        data_str_list = body.get("data")
+        regulator_type = body.get('regulator_type')
+        F1 = body.get('F1')
+        F2 = body.get('F2')
+        time = body.get('time')
+        delay = body.get('delay')
+        k = body.get('k')
+        Kp = body.get('Kp')
+        Ki = body.get("Ki")
+        Kd = body.get('Kd')
+
+        required_fields = {
+            "data": data_str_list,
+            'regulator_type': regulator_type,
+            'time': time,
+            'delay': delay,
+            'k': k
+        }
+
+        for field_name, value in required_fields.items():
+            if value is None or value == "":
+                raise HTTPException(status_code=400, detail=f"Отсутствует обязательное поле: {field_name}")
+
+        try:
+            data = [float(x) for x in data_str_list if x.strip() != '']
+        except (ValueError, TypeError) as e:
+            raise HTTPException(status_code=400, detail=f"Ошибка преобразования данных в число: {str(e)}")
+
+        if regulator_type == 'P':
+            time_array_regul, data_array = reculculate_p(F1, delay, Kp, k, time,  data=data)
+        elif regulator_type == 'PI':
+            time_array_regul, data_array = reculculate_pi(F1, k, Kp, Ki, delay, time, data)
+        else:
+            time_array_regul, data_array, Kp, Ki = reculculate_pid(F1, F2, k, Kp, Ki, Kd, delay, time, data)
+
+        return {
+            "success": True,
+            "time_array_regul": time_array_regul.tolist(),
+            "data_array": data_array.tolist(),
+            "message": f"Расчёт успешно выполнен"
         }
 
     except HTTPException as he:

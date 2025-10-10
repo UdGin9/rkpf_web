@@ -4,9 +4,9 @@ import { renderToString } from 'katex';
 
 export const TransferFunctionPage = () => {
 
-    const { getF } = useTransferFunction()
-    const { F1, F2, F3, k, D } = getF()
+    const { F1, F2, k, D } = useTransferFunction()
     const { regulatorType } = useRegulStore()
+
 
     let formula = ''
 
@@ -23,7 +23,7 @@ export const TransferFunctionPage = () => {
     return (
         <div className="p-10 flex flex-col gap-10 text-center">
             <div className="text-3xl font-bold text-center">Результаты расчета</div>
-                {F1 && F2 && F3 && k ? <>
+                {F1 ? <>
                     <div className="text-2xl font-bold text-center">Полученная передаточная функция</div>
                         <div
                         className="text-xl"

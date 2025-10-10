@@ -48,7 +48,7 @@ export const InputDataPage = () => {
   const handleSubmit = () => {
     const data = getColumnData('data')
     const payload = inputs.reduce(
-      (acc, item) => ({ ...acc, [item.key]: item.value, data, contur: selectedContur, }),
+      (acc, item) => ({ ...acc, [item.key]: item.value, data, contur: selectedContur}),
       {}
     )
     response.mutate(payload)
@@ -77,9 +77,9 @@ export const InputDataPage = () => {
         D,
         time_array_regul,
         data_array,
-        Kp: Kp,
-        Ki: Ki,
-        Kd: Kd,
+        Kp,
+        Ki,
+        Kd,
         regulator_type: regulator_type,
       } = response.data;
 
@@ -90,9 +90,8 @@ export const InputDataPage = () => {
         regulatorType: regulator_type,
       })
 
-      if (F1 && F2 && F3 && k) {
-        updateF(F1, F2, F3, k, D);
-      }
+      
+      updateF(F1, F2, F3, k, D)
 
       if (time_array_regul && data_array) {
         setChartData(time_array_regul, data_array);
@@ -115,10 +114,6 @@ export const InputDataPage = () => {
     response.isSuccess,
     response.data,
     updateColumn,
-    updateTimeArraySeconds,
-    updateYArray,
-    updateF,
-    setChartData,
   ]);
 
   return (
