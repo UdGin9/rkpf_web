@@ -8,6 +8,7 @@ dependencies = [
     "control>=0.9.4",
     "fastapi>=0.118.0",
     "numpy>=2.0.2",
+    "pyinstaller>=6.16.0",
     "sympy>=1.14.0",
     "uvicorn>=0.37.0",
 ]

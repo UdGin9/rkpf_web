@@ -85,8 +85,6 @@ export const RegulPageGraph = () => {
 
     let formula = '';
     
-
-
     if (regulatorType === 'P') {
         formula = `W(s) = K_p = ${Kp}`;
     } else if (regulatorType === 'PI') {

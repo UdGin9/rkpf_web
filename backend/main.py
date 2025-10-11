@@ -23,7 +23,6 @@ app.add_middleware(
 async def calculate(request: Request):
     try:
         body = await request.json()
-        print("Полученные данные:", body)
 
         time_step_seconds = body.get("time_step_seconds")
         data_str_list = body.get("data")
@@ -116,7 +115,6 @@ async def calculate(request: Request):
 async def reculculate(request: Request):
     try:
         body = await request.json()
-        print("Полученные данные:", body)
 
         data_str_list = body.get("data")
         regulatorType = body.get('regulatorType')

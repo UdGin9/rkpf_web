@@ -1,6 +1,19 @@
 import { useMutation } from "@tanstack/react-query";
 
-type InputPayload = Record<string, string>;
+type RegulatorType = 'P' | 'PI' | 'PID';
+
+type InputPayload = {
+  data: string[];
+  F1: string | number | null;
+  F2: string | number | null;
+  time: number;
+  delay: number | null;
+  k: string | number | null;
+  Kp: string | number | null;
+  Ki: string | number | null;
+  Kd: string | number | null;
+  regulatorType: RegulatorType | null;
+}
 
 export const useReCalculate = () => {
   return useMutation({
